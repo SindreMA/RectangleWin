@@ -74,9 +74,11 @@ func bottomTwoThirds(disp, _ w32.RECT) w32.RECT       { return toBottom(disp, 2,
 func bottomOneQuarter(disp, _ w32.RECT) w32.RECT      { return toBottom(disp, 1, 4) }
 func bottomThreeQuarters(disp, _ w32.RECT) w32.RECT   { return toBottom(disp, 3, 4) }
 
-func topLeftHalf(disp, _ w32.RECT) w32.RECT      { return merge(toLeft(disp, 1, 2), toTop(disp, 1, 2)) }
-func topLeftTwoThirds(disp, _ w32.RECT) w32.RECT { return merge(toLeft(disp, 2, 3), toTop(disp, 1, 2)) }
-func topLeftOneThirds(disp, _ w32.RECT) w32.RECT { return merge(toLeft(disp, 1, 3), toTop(disp, 1, 2)) }
+func topLeftHalf(disp, _ w32.RECT) w32.RECT           { return merge(toLeft(disp, 1, 2), toTop(disp, 1, 2)) }
+func topLeftTwoThirds(disp, _ w32.RECT) w32.RECT      { return merge(toLeft(disp, 2, 3), toTop(disp, 1, 2)) }
+func topLeftOneThirds(disp, _ w32.RECT) w32.RECT      { return merge(toLeft(disp, 1, 3), toTop(disp, 1, 2)) }
+func topLeftThreeQuarters(disp, _ w32.RECT) w32.RECT  { return merge(toLeft(disp, 3, 4), toTop(disp, 1, 2)) }
+func topLeftOneQuarter(disp, _ w32.RECT) w32.RECT     { return merge(toLeft(disp, 1, 4), toTop(disp, 1, 2)) }
 
 func maxHeight(disp, cur w32.RECT) w32.RECT {
 	return w32.RECT{Left: cur.Left, Right: cur.Right, Top: disp.Top, Bottom: disp.Bottom}
@@ -108,33 +110,23 @@ func resizeByPercent(disp, cur w32.RECT, sign int32) w32.RECT {
 func makeLarger(disp, cur w32.RECT) w32.RECT  { return resizeByPercent(disp, cur, 1) }
 func makeSmaller(disp, cur w32.RECT) w32.RECT { return resizeByPercent(disp, cur, -1) }
 
-func topRightHalf(disp, _ w32.RECT) w32.RECT { return merge(toRight(disp, 1, 2), toTop(disp, 1, 2)) }
-func topRightTwoThirds(disp, _ w32.RECT) w32.RECT {
-	return merge(toRight(disp, 2, 3), toTop(disp, 1, 2))
-}
-func topRightOneThirds(disp, _ w32.RECT) w32.RECT {
-	return merge(toRight(disp, 1, 3), toTop(disp, 1, 2))
-}
+func topRightHalf(disp, _ w32.RECT) w32.RECT          { return merge(toRight(disp, 1, 2), toTop(disp, 1, 2)) }
+func topRightTwoThirds(disp, _ w32.RECT) w32.RECT     { return merge(toRight(disp, 2, 3), toTop(disp, 1, 2)) }
+func topRightOneThirds(disp, _ w32.RECT) w32.RECT     { return merge(toRight(disp, 1, 3), toTop(disp, 1, 2)) }
+func topRightThreeQuarters(disp, _ w32.RECT) w32.RECT { return merge(toRight(disp, 3, 4), toTop(disp, 1, 2)) }
+func topRightOneQuarter(disp, _ w32.RECT) w32.RECT    { return merge(toRight(disp, 1, 4), toTop(disp, 1, 2)) }
 
-func bottomLeftHalf(disp, _ w32.RECT) w32.RECT {
-	return merge(toLeft(disp, 1, 2), toBottom(disp, 1, 2))
-}
-func bottomLeftTwoThirds(disp, _ w32.RECT) w32.RECT {
-	return merge(toLeft(disp, 2, 3), toBottom(disp, 1, 2))
-}
-func bottomLeftOneThirds(disp, _ w32.RECT) w32.RECT {
-	return merge(toLeft(disp, 1, 3), toBottom(disp, 1, 2))
-}
+func bottomLeftHalf(disp, _ w32.RECT) w32.RECT          { return merge(toLeft(disp, 1, 2), toBottom(disp, 1, 2)) }
+func bottomLeftTwoThirds(disp, _ w32.RECT) w32.RECT     { return merge(toLeft(disp, 2, 3), toBottom(disp, 1, 2)) }
+func bottomLeftOneThirds(disp, _ w32.RECT) w32.RECT     { return merge(toLeft(disp, 1, 3), toBottom(disp, 1, 2)) }
+func bottomLeftThreeQuarters(disp, _ w32.RECT) w32.RECT { return merge(toLeft(disp, 3, 4), toBottom(disp, 1, 2)) }
+func bottomLeftOneQuarter(disp, _ w32.RECT) w32.RECT    { return merge(toLeft(disp, 1, 4), toBottom(disp, 1, 2)) }
 
-func bottomRightHalf(disp, _ w32.RECT) w32.RECT {
-	return merge(toRight(disp, 1, 2), toBottom(disp, 1, 2))
-}
-func bottomRightTwoThirds(disp, _ w32.RECT) w32.RECT {
-	return merge(toRight(disp, 2, 3), toBottom(disp, 1, 2))
-}
-func bottomRightOneThirds(disp, _ w32.RECT) w32.RECT {
-	return merge(toRight(disp, 1, 3), toBottom(disp, 1, 2))
-}
+func bottomRightHalf(disp, _ w32.RECT) w32.RECT          { return merge(toRight(disp, 1, 2), toBottom(disp, 1, 2)) }
+func bottomRightTwoThirds(disp, _ w32.RECT) w32.RECT     { return merge(toRight(disp, 2, 3), toBottom(disp, 1, 2)) }
+func bottomRightOneThirds(disp, _ w32.RECT) w32.RECT     { return merge(toRight(disp, 1, 3), toBottom(disp, 1, 2)) }
+func bottomRightThreeQuarters(disp, _ w32.RECT) w32.RECT { return merge(toRight(disp, 3, 4), toBottom(disp, 1, 2)) }
+func bottomRightOneQuarter(disp, _ w32.RECT) w32.RECT    { return merge(toRight(disp, 1, 4), toBottom(disp, 1, 2)) }
 
 func hSlot(d w32.RECT, slot, div int32) w32.RECT {
 	w := d.Width() / div

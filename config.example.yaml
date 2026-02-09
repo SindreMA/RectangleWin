@@ -1,70 +1,78 @@
-# This is a sample config file for RectangleWin.
-# See conf.go for details.
+# RectangleWin default configuration
+# Place this file at: %HOME%/.config/RectangleWin/config.yaml
+#
+# Hardcoded shortcuts (always active, not configurable here):
+#   Win+Alt+Arrows        - Snap edges (cycles: half -> 3/4 -> 1/4)
+#   Win+Ctrl+Alt+Arrows   - Snap corners (cycles: half -> 3/4 -> 1/4)
+#   Win+Shift+F           - Maximize
+#   Win+Alt+C             - Center
+#   Win+Alt+A             - Toggle always on top
+#
+# When snapped to left/right (>=50% area), pressing the same key again
+# moves the window to the next monitor.
+# When snapped to top and pressing up again, the window maximizes.
+#
+# Available modifiers: Ctrl, Alt, Shift, Win (also: Meta, Super)
+# Available keys: A-Z, 0-9, UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, =, -
+#
+# Available bindfeature values:
+#   Edge cycling (half -> 3/4 -> 1/4):
+#     moveToLeft, moveToRight, moveToTop, moveToBottom
+#
+#   Corner cycling (half -> 3/4 -> 1/4):
+#     moveToTopLeft, moveToTopRight, moveToBottomLeft, moveToBottomRight
+#
+#   Quarter stepping (cycles through 4 quarter-width/height slots):
+#     leftOneQuarter, rightOneQuarter, topOneQuarter, bottomOneQuarter
+#
+#   Direct size (snaps to exact size, no cycling):
+#     leftHalf, leftOneThirds, leftTwoThirds, leftThreeQuarters
+#     rightHalf, rightOneThirds, rightTwoThirds, rightThreeQuarters
+#     topHalf, topOneThirds, topTwoThirds, topThreeQuarters
+#     bottomHalf, bottomOneThirds, bottomTwoThirds, bottomThreeQuarters
+#
+#   Resize:
+#     makeLarger, makeSmaller, makeFullHeight
+
 keybindings:
-    - modifier:
-        - Ctrl
-        - Alt
-      key: UP_ARROW
-      bindfeature: moveToTop
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: DOWN_ARROW
-      bindfeature: moveToBottom
-      
-    - modifier:
-        - Ctrl
-        - Alt
+    # Ctrl+Win+Arrows = 1/2 screen
+    - modifier: [Ctrl, Win]
       key: LEFT_ARROW
-      bindfeature: moveToLeft
-      
-    - modifier:
-        - Ctrl
-        - Alt
+      bindfeature: leftHalf
+    - modifier: [Ctrl, Win]
       key: RIGHT_ARROW
-      bindfeature: moveToRight
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: U
-      bindfeature: moveToTopLeft
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: I
-      bindfeature: moveToTopRight
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: J
-      bindfeature: moveToBottomLeft
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: K
-      bindfeature: moveToBottomRight
-
-    - modifier:
-        - Ctrl
-        - Alt
-      key: =
-      bindfeature: makeLarger
-
-    - modifier:
-        - Ctrl
-        - Alt
-      key: "-"
-      bindfeature: makeSmaller
-
-    - modifier:
-        - Ctrl
-        - Alt
-        - Shift
+      bindfeature: rightHalf
+    - modifier: [Ctrl, Win]
       key: UP_ARROW
-      bindfeature: makeFullHeight
+      bindfeature: topHalf
+    - modifier: [Ctrl, Win]
+      key: DOWN_ARROW
+      bindfeature: bottomHalf
 
+    # Ctrl+Alt+Shift+Arrows = 3/4 screen
+    - modifier: [Ctrl, Alt, Shift]
+      key: LEFT_ARROW
+      bindfeature: leftThreeQuarters
+    - modifier: [Ctrl, Alt, Shift]
+      key: RIGHT_ARROW
+      bindfeature: rightThreeQuarters
+    - modifier: [Ctrl, Alt, Shift]
+      key: UP_ARROW
+      bindfeature: topThreeQuarters
+    - modifier: [Ctrl, Alt, Shift]
+      key: DOWN_ARROW
+      bindfeature: bottomThreeQuarters
+
+    # Ctrl+Win+Shift+Arrows = 1/4 screen
+    - modifier: [Ctrl, Win, Shift]
+      key: LEFT_ARROW
+      bindfeature: leftOneQuarter
+    - modifier: [Ctrl, Win, Shift]
+      key: RIGHT_ARROW
+      bindfeature: rightOneQuarter
+    - modifier: [Ctrl, Win, Shift]
+      key: UP_ARROW
+      bindfeature: topOneQuarter
+    - modifier: [Ctrl, Win, Shift]
+      key: DOWN_ARROW
+      bindfeature: bottomOneQuarter

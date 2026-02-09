@@ -1,68 +1,42 @@
 keybindings:
-    - modifier:
-        - Ctrl
-        - Alt
-      key: UP_ARROW
-      bindfeature: moveToTop
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: DOWN_ARROW
-      bindfeature: moveToBottom
-      
-    - modifier:
-        - Ctrl
-        - Alt
+    # Ctrl+Win+Arrows = 1/2 screen
+    - modifier: [Ctrl, Win]
       key: LEFT_ARROW
-      bindfeature: moveToLeft
-      
-    - modifier:
-        - Ctrl
-        - Alt
+      bindfeature: leftHalf
+    - modifier: [Ctrl, Win]
       key: RIGHT_ARROW
-      bindfeature: moveToRight
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: U
-      bindfeature: moveToTopLeft
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: I
-      bindfeature: moveToTopRight
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: J
-      bindfeature: moveToBottomLeft
-      
-    - modifier:
-        - Ctrl
-        - Alt
-      key: K
-      bindfeature: moveToBottomRight
-
-    - modifier:
-        - Ctrl
-        - Alt
-      key: =
-      bindfeature: makeLarger
-
-    - modifier:
-        - Ctrl
-        - Alt
-      key: "-"
-      bindfeature: makeSmaller
-
-    - modifier:
-        - Ctrl
-        - Alt
-        - Shift
+      bindfeature: rightHalf
+    - modifier: [Ctrl, Win]
       key: UP_ARROW
-      bindfeature: makeFullHeight
+      bindfeature: topHalf
+    - modifier: [Ctrl, Win]
+      key: DOWN_ARROW
+      bindfeature: bottomHalf
 
+    # Ctrl+Alt+Shift+Arrows = 3/4 screen
+    - modifier: [Ctrl, Alt, Shift]
+      key: LEFT_ARROW
+      bindfeature: leftThreeQuarters
+    - modifier: [Ctrl, Alt, Shift]
+      key: RIGHT_ARROW
+      bindfeature: rightThreeQuarters
+    - modifier: [Ctrl, Alt, Shift]
+      key: UP_ARROW
+      bindfeature: topThreeQuarters
+    - modifier: [Ctrl, Alt, Shift]
+      key: DOWN_ARROW
+      bindfeature: bottomThreeQuarters
+
+    # Ctrl+Win+Shift+Arrows = 1/4 screen
+    - modifier: [Ctrl, Win, Shift]
+      key: LEFT_ARROW
+      bindfeature: leftOneQuarter
+    - modifier: [Ctrl, Win, Shift]
+      key: RIGHT_ARROW
+      bindfeature: rightOneQuarter
+    - modifier: [Ctrl, Win, Shift]
+      key: UP_ARROW
+      bindfeature: topOneQuarter
+    - modifier: [Ctrl, Win, Shift]
+      key: DOWN_ARROW
+      bindfeature: bottomOneQuarter

@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"syscall"
 
 	"github.com/gonutz/w32/v2"
@@ -30,6 +31,58 @@ func EnumMonitors(f func(d w32.HMONITOR) bool) bool {
 		return 0
 	})
 	return w32.EnumDisplayMonitors(0, nil, callback, 0)
+}
+
+type direction int
+
+const (
+	dirNone  direction = -1
+	dirLeft  direction = 0
+	dirRight direction = 1
+	dirUp    direction = 2
+	dirDown  direction = 3
+)
+
+// getNextMonitor returns the next monitor in a consistent order (sorted by X then Y),
+// cycling back to the first after the last. Returns 0 if only one monitor exists.
+func getNextMonitor(current w32.HMONITOR) w32.HMONITOR {
+	type monEntry struct {
+		handle  w32.HMONITOR
+		centerX int32
+		centerY int32
+	}
+
+	var monitors []monEntry
+	EnumMonitors(func(h w32.HMONITOR) bool {
+		var info w32.MONITORINFO
+		if w32.GetMonitorInfo(h, &info) {
+			r := info.RcMonitor
+			monitors = append(monitors, monEntry{
+				handle:  h,
+				centerX: (r.Left + r.Right) / 2,
+				centerY: (r.Top + r.Bottom) / 2,
+			})
+		}
+		return true
+	})
+
+	if len(monitors) <= 1 {
+		return 0
+	}
+
+	sort.Slice(monitors, func(i, j int) bool {
+		if monitors[i].centerX != monitors[j].centerX {
+			return monitors[i].centerX < monitors[j].centerX
+		}
+		return monitors[i].centerY < monitors[j].centerY
+	})
+
+	for i, m := range monitors {
+		if m.handle == current {
+			return monitors[(i+1)%len(monitors)].handle
+		}
+	}
+	return 0
 }
 
 func printMonitors() {

@@ -29,13 +29,11 @@ import (
 	"github.com/gonutz/w32/v2"
 
 	"github.com/ahmetb/RectangleWin/w32ex"
-	"github.com/apenwarr/fixconsole"
 )
 
 var lastResized w32.HWND
 
 func main() {
-	err := fixconsole.FixConsoleIfNeeded()
 	runtime.LockOSThread() // since we bind hotkeys etc that need to dispatch their message here
 	if !w32ex.SetProcessDPIAware() {
 		panic("failed to set DPI aware")
@@ -49,16 +47,16 @@ func main() {
 	printMonitors()
 
 	edgeFuncs := [][]resizeFunc{
-		{leftHalf, leftTwoThirds, leftOneThirds},
-		{rightHalf, rightTwoThirds, rightOneThirds},
-		{topHalf, topTwoThirds, topOneThirds},
-		{bottomHalf, bottomTwoThirds, bottomOneThirds}}
+		{leftHalf, leftThreeQuarters, leftOneQuarter},
+		{rightHalf, rightThreeQuarters, rightOneQuarter},
+		{topHalf, topThreeQuarters, topOneQuarter},
+		{bottomHalf, bottomThreeQuarters, bottomOneQuarter}}
 	edgeFuncTurn := make([]int, len(edgeFuncs))
 	cornerFuncs := [][]resizeFunc{
-		{topLeftHalf, topLeftTwoThirds, topLeftOneThirds},
-		{topRightHalf, topRightTwoThirds, topRightOneThirds},
-		{bottomLeftHalf, bottomLeftTwoThirds, bottomLeftOneThirds},
-		{bottomRightHalf, bottomRightTwoThirds, bottomRightOneThirds}}
+		{topLeftHalf, topLeftThreeQuarters, topLeftOneQuarter},
+		{topRightHalf, topRightThreeQuarters, topRightOneQuarter},
+		{bottomLeftHalf, bottomLeftThreeQuarters, bottomLeftOneQuarter},
+		{bottomRightHalf, bottomRightThreeQuarters, bottomRightOneQuarter}}
 	cornerFuncTurn := make([]int, len(cornerFuncs))
 	quarterStepFuncs := [][]resizeFunc{
 		{leftQuarterStep0, leftQuarterStep1, leftQuarterStep2, leftQuarterStep3},
@@ -67,29 +65,39 @@ func main() {
 		{bottomQuarterStep0, bottomQuarterStep1, bottomQuarterStep2, bottomQuarterStep3}}
 	quarterStepTurn := make([]int, len(quarterStepFuncs))
 
-	cycleFuncs := func(funcs [][]resizeFunc, turns *[]int, i int) {
+	indexToDir := []direction{dirLeft, dirRight, dirUp, dirDown}
+
+	var lastCycleGroup *[]int
+	var lastCycleIndex int = -1
+
+	resetAllCycles := func() {
+		edgeFuncTurn = make([]int, len(edgeFuncs))
+		cornerFuncTurn = make([]int, len(cornerFuncs))
+		quarterStepTurn = make([]int, len(quarterStepFuncs))
+		lastCycleGroup = nil
+		lastCycleIndex = -1
+	}
+
+	cycleFuncs := func(funcs [][]resizeFunc, turns *[]int, i int, dir direction) {
 		hwnd := w32.GetForegroundWindow()
 		if hwnd == 0 {
 			panic("foreground window is NULL")
 		}
-		if lastResized != hwnd {
-			*turns = make([]int, len(funcs)) // reset
+		if lastResized != hwnd || turns != lastCycleGroup || i != lastCycleIndex {
+			resetAllCycles()
 		}
-		if _, err := resize(hwnd, funcs[i][(*turns)[i]%len(funcs[i])]); err != nil {
+		lastCycleGroup = turns
+		lastCycleIndex = i
+		if _, err := resize(hwnd, funcs[i][(*turns)[i]%len(funcs[i])], dir); err != nil {
 			fmt.Printf("warn: resize: %v\n", err)
 			return
 		}
 		(*turns)[i]++
-		for j := 0; j < len(*turns); j++ {
-			if j != i {
-				(*turns)[j] = 0
-			}
-		}
 	}
 
-	cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i) }
-	cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i) }
-	cycleQuarterStepFuncs := func(i int) { cycleFuncs(quarterStepFuncs, &quarterStepTurn, i) }
+	cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i, indexToDir[i]) }
+	cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i, indexToDir[i]) }
+	cycleQuarterStepFuncs := func(i int) { cycleFuncs(quarterStepFuncs, &quarterStepTurn, i, indexToDir[i]) }
 
 	hks := []HotKey{
 		(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
@@ -102,20 +110,21 @@ func main() {
 		(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }}),
 		(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }}),
 		(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
-			lastResized = 0 // cause edgeFuncTurn to be reset
+			resetAllCycles()
 			if err := maximize(); err != nil {
 				fmt.Printf("warn: maximize: %v\n", err)
 				return
 			}
 		}}),
 		(HotKey{id: 60, mod: MOD_ALT | MOD_WIN, vk: 0x43 /*C*/, callback: func() {
-			lastResized = 0 // cause edgeFuncTurn to be reset
-			if _, err := resize(w32.GetForegroundWindow(), center); err != nil {
+			resetAllCycles()
+			if _, err := resize(w32.GetForegroundWindow(), center, dirNone); err != nil {
 				fmt.Printf("warn: resize: %v\n", err)
 				return
 			}
 		}}),
 		(HotKey{id: 70, mod: MOD_ALT | MOD_WIN, vk: 0x41 /*A*/, callback: func() {
+			resetAllCycles()
 			hwnd := w32.GetForegroundWindow()
 			if err := toggleAlwaysOnTop(hwnd); err != nil {
 				fmt.Printf("warn: toggleAlwaysOnTop: %v\n", err)
@@ -193,7 +202,8 @@ func main() {
 				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
 				vk:  int(keyBinding.KeyCode),
 				callback: func() {
-					if _, err := resize(w32.GetForegroundWindow(), makeLarger); err != nil {
+					resetAllCycles()
+					if _, err := resize(w32.GetForegroundWindow(), makeLarger, dirNone); err != nil {
 						fmt.Printf("warn: resize: %v\n", err)
 						return
 					}
@@ -205,7 +215,8 @@ func main() {
 				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
 				vk:  int(keyBinding.KeyCode),
 				callback: func() {
-					if _, err := resize(w32.GetForegroundWindow(), makeSmaller); err != nil {
+					resetAllCycles()
+					if _, err := resize(w32.GetForegroundWindow(), makeSmaller, dirNone); err != nil {
 						fmt.Printf("warn: resize: %v\n", err)
 						return
 					}
@@ -217,7 +228,8 @@ func main() {
 				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
 				vk:  int(keyBinding.KeyCode),
 				callback: func() {
-					if _, err := resize(w32.GetForegroundWindow(), maxHeight); err != nil {
+					resetAllCycles()
+					if _, err := resize(w32.GetForegroundWindow(), maxHeight, dirNone); err != nil {
 						fmt.Printf("warn: resize: %v\n", err)
 						return
 					}
@@ -265,13 +277,26 @@ func main() {
 				"bottomThreeQuarters": bottomThreeQuarters,
 			}
 			fn := directFuncs[keyBinding.BindFeature]
+			directDir := dirNone
+			switch {
+			case len(keyBinding.BindFeature) >= 4 && keyBinding.BindFeature[:4] == "left":
+				directDir = dirLeft
+			case len(keyBinding.BindFeature) >= 5 && keyBinding.BindFeature[:5] == "right":
+				directDir = dirRight
+			case len(keyBinding.BindFeature) >= 3 && keyBinding.BindFeature[:3] == "top":
+				directDir = dirUp
+			case len(keyBinding.BindFeature) >= 6 && keyBinding.BindFeature[:6] == "bottom":
+				directDir = dirDown
+			}
+			dd := directDir
 			id += 1
 			hks = append(hks, (HotKey{
 				id:  id,
 				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
 				vk:  int(keyBinding.KeyCode),
 				callback: func() {
-					if _, err := resize(w32.GetForegroundWindow(), fn); err != nil {
+					resetAllCycles()
+					if _, err := resize(w32.GetForegroundWindow(), fn, dd); err != nil {
 						fmt.Printf("warn: resize: %v\n", err)
 						return
 					}
@@ -330,7 +355,7 @@ func center(disp, cur w32.RECT) w32.RECT {
 		Bottom: disp.Top + h + cur.Height()}
 }
 
-func resize(hwnd w32.HWND, f resizeFunc) (bool, error) {
+func resize(hwnd w32.HWND, f resizeFunc, dir direction) (bool, error) {
 	if !isZonableWindow(hwnd) {
 		fmt.Printf("warn: non-zonable window: %s\n", w32.GetWindowText(hwnd))
 		return false, nil
@@ -374,8 +399,40 @@ func resize(hwnd w32.HWND, f resizeFunc) (bool, error) {
 
 	lastResized = hwnd
 	if sameRect(rect, &newPos) {
-		fmt.Println("no resize")
-		return false, nil
+		if dir == dirUp {
+			// Up arrow when already at position: maximize the window
+			fmt.Println("> maximizing window")
+			if !w32.ShowWindow(hwnd, w32.SW_MAXIMIZE) {
+				return false, fmt.Errorf("failed to ShowWindow(SW_MAXIMIZE):%d", w32.GetLastError())
+			}
+			return true, nil
+		}
+		if dir != dirLeft && dir != dirRight {
+			fmt.Println("no resize")
+			return false, nil
+		}
+		// Check if the snap covers >=50% of the monitor area
+		monArea := int64(monInfo.RcWork.Width()) * int64(monInfo.RcWork.Height())
+		snapArea := int64(newPos.Width()) * int64(newPos.Height())
+		if snapArea*2 < monArea {
+			fmt.Println("no resize (snap <50% area, skipping monitor move)")
+			return false, nil
+		}
+		nextMon := getNextMonitor(mon)
+		if nextMon == 0 {
+			fmt.Println("no resize (no next monitor)")
+			return false, nil
+		}
+		var nextMonInfo w32.MONITORINFO
+		if !w32.GetMonitorInfo(nextMon, &nextMonInfo) {
+			return false, fmt.Errorf("failed to GetMonitorInfo for next monitor:%d", w32.GetLastError())
+		}
+		fmt.Printf("> moving to next monitor 0x%X\n", nextMon)
+		newPos = f(nextMonInfo.RcWork, resizedFrame)
+		newPos.Left -= lExtra
+		newPos.Top -= tExtra
+		newPos.Right += rExtra
+		newPos.Bottom += bExtra
 	}
 
 	fmt.Printf("> resizing to: %#v (W:%d,H:%d)\n", newPos, newPos.Width(), newPos.Height())
