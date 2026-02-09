@@ -269,11 +269,11 @@ func main() {
 			directFuncs := map[string]resizeFunc{
 				"leftHalf": leftHalf, "leftTwoThirds": leftTwoThirds, "leftOneThirds": leftOneThirds,
 				"leftThreeQuarters": leftThreeQuarters,
-				"rightHalf": rightHalf, "rightTwoThirds": rightTwoThirds, "rightOneThirds": rightOneThirds,
+				"rightHalf":         rightHalf, "rightTwoThirds": rightTwoThirds, "rightOneThirds": rightOneThirds,
 				"rightThreeQuarters": rightThreeQuarters,
-				"topHalf": topHalf, "topTwoThirds": topTwoThirds, "topOneThirds": topOneThirds,
+				"topHalf":            topHalf, "topTwoThirds": topTwoThirds, "topOneThirds": topOneThirds,
 				"topThreeQuarters": topThreeQuarters,
-				"bottomHalf": bottomHalf, "bottomTwoThirds": bottomTwoThirds, "bottomOneThirds": bottomOneThirds,
+				"bottomHalf":       bottomHalf, "bottomTwoThirds": bottomTwoThirds, "bottomOneThirds": bottomOneThirds,
 				"bottomThreeQuarters": bottomThreeQuarters,
 			}
 			fn := directFuncs[keyBinding.BindFeature]

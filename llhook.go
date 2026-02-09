@@ -29,12 +29,12 @@ type KBDLLHOOKSTRUCT struct {
 }
 
 var (
-	procSetWindowsHookEx    = user32Hook.NewProc("SetWindowsHookExW")
-	procCallNextHookEx      = user32Hook.NewProc("CallNextHookEx")
-	procGetAsyncKeyState    = user32Hook.NewProc("GetAsyncKeyState")
-	user32Hook              = syscall.NewLazyDLL("user32.dll")
-	llHookHandle            uintptr
-	llHookedKeys            []HotKey
+	procSetWindowsHookEx = user32Hook.NewProc("SetWindowsHookExW")
+	procCallNextHookEx   = user32Hook.NewProc("CallNextHookEx")
+	procGetAsyncKeyState = user32Hook.NewProc("GetAsyncKeyState")
+	user32Hook           = syscall.NewLazyDLL("user32.dll")
+	llHookHandle         uintptr
+	llHookedKeys         []HotKey
 )
 
 func isKeyDown(vk uintptr) bool {
