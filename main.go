@@ -60,6 +60,12 @@ func main() {
 		{bottomLeftHalf, bottomLeftTwoThirds, bottomLeftOneThirds},
 		{bottomRightHalf, bottomRightTwoThirds, bottomRightOneThirds}}
 	cornerFuncTurn := make([]int, len(cornerFuncs))
+	quarterStepFuncs := [][]resizeFunc{
+		{leftQuarterStep0, leftQuarterStep1, leftQuarterStep2, leftQuarterStep3},
+		{rightQuarterStep0, rightQuarterStep1, rightQuarterStep2, rightQuarterStep3},
+		{topQuarterStep0, topQuarterStep1, topQuarterStep2, topQuarterStep3},
+		{bottomQuarterStep0, bottomQuarterStep1, bottomQuarterStep2, bottomQuarterStep3}}
+	quarterStepTurn := make([]int, len(quarterStepFuncs))
 
 	cycleFuncs := func(funcs [][]resizeFunc, turns *[]int, i int) {
 		hwnd := w32.GetForegroundWindow()
@@ -67,7 +73,7 @@ func main() {
 			panic("foreground window is NULL")
 		}
 		if lastResized != hwnd {
-			*turns = make([]int, len(edgeFuncs)) // reset
+			*turns = make([]int, len(funcs)) // reset
 		}
 		if _, err := resize(hwnd, funcs[i][(*turns)[i]%len(funcs[i])]); err != nil {
 			fmt.Printf("warn: resize: %v\n", err)
@@ -83,6 +89,7 @@ func main() {
 
 	cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i) }
 	cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i) }
+	cycleQuarterStepFuncs := func(i int) { cycleFuncs(quarterStepFuncs, &quarterStepTurn, i) }
 
 	hks := []HotKey{
 		(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
@@ -215,6 +222,60 @@ func main() {
 						return
 					}
 				}}))
+		case "leftOneQuarter":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleQuarterStepFuncs(0) }}))
+		case "rightOneQuarter":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleQuarterStepFuncs(1) }}))
+		case "topOneQuarter":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleQuarterStepFuncs(2) }}))
+		case "bottomOneQuarter":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleQuarterStepFuncs(3) }}))
+		case "leftHalf", "leftTwoThirds", "leftOneThirds", "leftThreeQuarters",
+			"rightHalf", "rightTwoThirds", "rightOneThirds", "rightThreeQuarters",
+			"topHalf", "topTwoThirds", "topOneThirds", "topThreeQuarters",
+			"bottomHalf", "bottomTwoThirds", "bottomOneThirds", "bottomThreeQuarters":
+			directFuncs := map[string]resizeFunc{
+				"leftHalf": leftHalf, "leftTwoThirds": leftTwoThirds, "leftOneThirds": leftOneThirds,
+				"leftThreeQuarters": leftThreeQuarters,
+				"rightHalf": rightHalf, "rightTwoThirds": rightTwoThirds, "rightOneThirds": rightOneThirds,
+				"rightThreeQuarters": rightThreeQuarters,
+				"topHalf": topHalf, "topTwoThirds": topTwoThirds, "topOneThirds": topOneThirds,
+				"topThreeQuarters": topThreeQuarters,
+				"bottomHalf": bottomHalf, "bottomTwoThirds": bottomTwoThirds, "bottomOneThirds": bottomOneThirds,
+				"bottomThreeQuarters": bottomThreeQuarters,
+			}
+			fn := directFuncs[keyBinding.BindFeature]
+			id += 1
+			hks = append(hks, (HotKey{
+				id:  id,
+				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:  int(keyBinding.KeyCode),
+				callback: func() {
+					if _, err := resize(w32.GetForegroundWindow(), fn); err != nil {
+						fmt.Printf("warn: resize: %v\n", err)
+						return
+					}
+				}}))
 		default:
 			continue
 		}
@@ -227,12 +288,11 @@ func main() {
 		}
 	}
 	if len(failedHotKeys) > 0 {
-		msg := "The following hotkey(s) are in use by another process:\n\n"
+		fmt.Printf("RegisterHotKey failed for %d hotkey(s), falling back to low-level keyboard hook:\n", len(failedHotKeys))
 		for _, hk := range failedHotKeys {
-			msg += "  - " + hk.Describe() + "\n"
+			fmt.Printf("  - %s\n", hk.Describe())
 		}
-		msg += "\nTo use these hotkeys in RectangleWin, close the other process using the key combination(s)."
-		showMessageBox(msg)
+		installLLHook(failedHotKeys)
 	}
 
 	exitCh := make(chan os.Signal)

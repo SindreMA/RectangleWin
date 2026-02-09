@@ -50,21 +50,29 @@ func toBottom(d w32.RECT, mul, div int32) w32.RECT {
 		Bottom: d.Top + d.Height()}
 }
 
-func leftHalf(disp, _ w32.RECT) w32.RECT      { return toLeft(disp, 1, 2) }
-func leftOneThirds(disp, _ w32.RECT) w32.RECT { return toLeft(disp, 1, 3) }
-func leftTwoThirds(disp, _ w32.RECT) w32.RECT { return toLeft(disp, 2, 3) }
+func leftHalf(disp, _ w32.RECT) w32.RECT           { return toLeft(disp, 1, 2) }
+func leftOneThirds(disp, _ w32.RECT) w32.RECT      { return toLeft(disp, 1, 3) }
+func leftTwoThirds(disp, _ w32.RECT) w32.RECT      { return toLeft(disp, 2, 3) }
+func leftOneQuarter(disp, _ w32.RECT) w32.RECT     { return toLeft(disp, 1, 4) }
+func leftThreeQuarters(disp, _ w32.RECT) w32.RECT  { return toLeft(disp, 3, 4) }
 
-func topHalf(disp, _ w32.RECT) w32.RECT      { return toTop(disp, 1, 2) }
-func topOneThirds(disp, _ w32.RECT) w32.RECT { return toTop(disp, 1, 3) }
-func topTwoThirds(disp, _ w32.RECT) w32.RECT { return toTop(disp, 2, 3) }
+func topHalf(disp, _ w32.RECT) w32.RECT            { return toTop(disp, 1, 2) }
+func topOneThirds(disp, _ w32.RECT) w32.RECT       { return toTop(disp, 1, 3) }
+func topTwoThirds(disp, _ w32.RECT) w32.RECT       { return toTop(disp, 2, 3) }
+func topOneQuarter(disp, _ w32.RECT) w32.RECT      { return toTop(disp, 1, 4) }
+func topThreeQuarters(disp, _ w32.RECT) w32.RECT   { return toTop(disp, 3, 4) }
 
-func rightHalf(disp, _ w32.RECT) w32.RECT      { return toRight(disp, 1, 2) }
-func rightOneThirds(disp, _ w32.RECT) w32.RECT { return toRight(disp, 1, 3) }
-func rightTwoThirds(disp, _ w32.RECT) w32.RECT { return toRight(disp, 2, 3) }
+func rightHalf(disp, _ w32.RECT) w32.RECT          { return toRight(disp, 1, 2) }
+func rightOneThirds(disp, _ w32.RECT) w32.RECT     { return toRight(disp, 1, 3) }
+func rightTwoThirds(disp, _ w32.RECT) w32.RECT     { return toRight(disp, 2, 3) }
+func rightOneQuarter(disp, _ w32.RECT) w32.RECT    { return toRight(disp, 1, 4) }
+func rightThreeQuarters(disp, _ w32.RECT) w32.RECT { return toRight(disp, 3, 4) }
 
-func bottomHalf(disp, _ w32.RECT) w32.RECT      { return toBottom(disp, 1, 2) }
-func bottomOneThirds(disp, _ w32.RECT) w32.RECT { return toBottom(disp, 1, 3) }
-func bottomTwoThirds(disp, _ w32.RECT) w32.RECT { return toBottom(disp, 2, 3) }
+func bottomHalf(disp, _ w32.RECT) w32.RECT            { return toBottom(disp, 1, 2) }
+func bottomOneThirds(disp, _ w32.RECT) w32.RECT       { return toBottom(disp, 1, 3) }
+func bottomTwoThirds(disp, _ w32.RECT) w32.RECT       { return toBottom(disp, 2, 3) }
+func bottomOneQuarter(disp, _ w32.RECT) w32.RECT      { return toBottom(disp, 1, 4) }
+func bottomThreeQuarters(disp, _ w32.RECT) w32.RECT   { return toBottom(disp, 3, 4) }
 
 func topLeftHalf(disp, _ w32.RECT) w32.RECT      { return merge(toLeft(disp, 1, 2), toTop(disp, 1, 2)) }
 func topLeftTwoThirds(disp, _ w32.RECT) w32.RECT { return merge(toLeft(disp, 2, 3), toTop(disp, 1, 2)) }
@@ -127,6 +135,48 @@ func bottomRightTwoThirds(disp, _ w32.RECT) w32.RECT {
 func bottomRightOneThirds(disp, _ w32.RECT) w32.RECT {
 	return merge(toRight(disp, 1, 3), toBottom(disp, 1, 2))
 }
+
+func hSlot(d w32.RECT, slot, div int32) w32.RECT {
+	w := d.Width() / div
+	return w32.RECT{
+		Left:   d.Left + w*slot,
+		Top:    d.Top,
+		Right:  d.Left + w*(slot+1),
+		Bottom: d.Top + d.Height()}
+}
+
+func vSlot(d w32.RECT, slot, div int32) w32.RECT {
+	h := d.Height() / div
+	return w32.RECT{
+		Left:   d.Left,
+		Top:    d.Top + h*slot,
+		Right:  d.Left + d.Width(),
+		Bottom: d.Top + h*(slot+1)}
+}
+
+// Quarter stepping: left starts at slot 0 (leftmost), steps inward
+func leftQuarterStep0(disp, _ w32.RECT) w32.RECT { return hSlot(disp, 0, 4) }
+func leftQuarterStep1(disp, _ w32.RECT) w32.RECT { return hSlot(disp, 1, 4) }
+func leftQuarterStep2(disp, _ w32.RECT) w32.RECT { return hSlot(disp, 2, 4) }
+func leftQuarterStep3(disp, _ w32.RECT) w32.RECT { return hSlot(disp, 3, 4) }
+
+// Quarter stepping: right starts at slot 3 (rightmost), steps inward
+func rightQuarterStep0(disp, _ w32.RECT) w32.RECT { return hSlot(disp, 3, 4) }
+func rightQuarterStep1(disp, _ w32.RECT) w32.RECT { return hSlot(disp, 2, 4) }
+func rightQuarterStep2(disp, _ w32.RECT) w32.RECT { return hSlot(disp, 1, 4) }
+func rightQuarterStep3(disp, _ w32.RECT) w32.RECT { return hSlot(disp, 0, 4) }
+
+// Quarter stepping: top starts at slot 0 (topmost), steps inward
+func topQuarterStep0(disp, _ w32.RECT) w32.RECT { return vSlot(disp, 0, 4) }
+func topQuarterStep1(disp, _ w32.RECT) w32.RECT { return vSlot(disp, 1, 4) }
+func topQuarterStep2(disp, _ w32.RECT) w32.RECT { return vSlot(disp, 2, 4) }
+func topQuarterStep3(disp, _ w32.RECT) w32.RECT { return vSlot(disp, 3, 4) }
+
+// Quarter stepping: bottom starts at slot 3 (bottommost), steps inward
+func bottomQuarterStep0(disp, _ w32.RECT) w32.RECT { return vSlot(disp, 3, 4) }
+func bottomQuarterStep1(disp, _ w32.RECT) w32.RECT { return vSlot(disp, 2, 4) }
+func bottomQuarterStep2(disp, _ w32.RECT) w32.RECT { return vSlot(disp, 1, 4) }
+func bottomQuarterStep3(disp, _ w32.RECT) w32.RECT { return vSlot(disp, 0, 4) }
 
 func merge(x, y w32.RECT) w32.RECT {
 	return w32.RECT{Left: x.Left, Right: x.Right, Top: y.Top, Bottom: y.Bottom}
