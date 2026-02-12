@@ -49,7 +49,7 @@ func main() {
 	edgeFuncs := [][]resizeFunc{
 		{leftHalf, leftThreeQuarters, leftOneQuarter},
 		{rightHalf, rightThreeQuarters, rightOneQuarter},
-		{topHalf, topThreeQuarters, topOneQuarter},
+		{centerHalf, centerThreeQuarters, centerOneQuarter},
 		{bottomHalf, bottomThreeQuarters, bottomOneQuarter}}
 	edgeFuncTurn := make([]int, len(edgeFuncs))
 	cornerFuncs := [][]resizeFunc{
@@ -262,10 +262,24 @@ func main() {
 				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
 				vk:       int(keyBinding.KeyCode),
 				callback: func() { cycleQuarterStepFuncs(3) }}))
+		case "center":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:  id,
+				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:  int(keyBinding.KeyCode),
+				callback: func() {
+					resetAllCycles()
+					if _, err := resize(w32.GetForegroundWindow(), center, dirNone); err != nil {
+						fmt.Printf("warn: resize: %v\n", err)
+						return
+					}
+				}}))
 		case "leftHalf", "leftTwoThirds", "leftOneThirds", "leftThreeQuarters",
 			"rightHalf", "rightTwoThirds", "rightOneThirds", "rightThreeQuarters",
 			"topHalf", "topTwoThirds", "topOneThirds", "topThreeQuarters",
-			"bottomHalf", "bottomTwoThirds", "bottomOneThirds", "bottomThreeQuarters":
+			"bottomHalf", "bottomTwoThirds", "bottomOneThirds", "bottomThreeQuarters",
+			"centerHalf", "centerTwoThirds", "centerOneThirds", "centerThreeQuarters", "centerOneQuarter":
 			directFuncs := map[string]resizeFunc{
 				"leftHalf": leftHalf, "leftTwoThirds": leftTwoThirds, "leftOneThirds": leftOneThirds,
 				"leftThreeQuarters": leftThreeQuarters,
@@ -275,6 +289,8 @@ func main() {
 				"topThreeQuarters": topThreeQuarters,
 				"bottomHalf":       bottomHalf, "bottomTwoThirds": bottomTwoThirds, "bottomOneThirds": bottomOneThirds,
 				"bottomThreeQuarters": bottomThreeQuarters,
+				"centerHalf":          centerHalf, "centerTwoThirds": centerTwoThirds, "centerOneThirds": centerOneThirds,
+				"centerThreeQuarters": centerThreeQuarters, "centerOneQuarter": centerOneQuarter,
 			}
 			fn := directFuncs[keyBinding.BindFeature]
 			directDir := dirNone

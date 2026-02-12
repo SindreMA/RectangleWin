@@ -62,6 +62,22 @@ func topTwoThirds(disp, _ w32.RECT) w32.RECT     { return toTop(disp, 2, 3) }
 func topOneQuarter(disp, _ w32.RECT) w32.RECT    { return toTop(disp, 1, 4) }
 func topThreeQuarters(disp, _ w32.RECT) w32.RECT { return toTop(disp, 3, 4) }
 
+func toCenter(d w32.RECT, mul, div int32) w32.RECT {
+	w := d.Width() * mul / div
+	h := d.Height() * mul / div
+	return w32.RECT{
+		Left:   d.Left + (d.Width()-w)/2,
+		Top:    d.Top + (d.Height()-h)/2,
+		Right:  d.Left + (d.Width()-w)/2 + w,
+		Bottom: d.Top + (d.Height()-h)/2 + h}
+}
+
+func centerHalf(disp, _ w32.RECT) w32.RECT          { return toCenter(disp, 1, 2) }
+func centerOneThirds(disp, _ w32.RECT) w32.RECT     { return toCenter(disp, 1, 3) }
+func centerTwoThirds(disp, _ w32.RECT) w32.RECT     { return toCenter(disp, 2, 3) }
+func centerOneQuarter(disp, _ w32.RECT) w32.RECT    { return toCenter(disp, 1, 4) }
+func centerThreeQuarters(disp, _ w32.RECT) w32.RECT { return toCenter(disp, 3, 4) }
+
 func rightHalf(disp, _ w32.RECT) w32.RECT          { return toRight(disp, 1, 2) }
 func rightOneThirds(disp, _ w32.RECT) w32.RECT     { return toRight(disp, 1, 3) }
 func rightTwoThirds(disp, _ w32.RECT) w32.RECT     { return toRight(disp, 2, 3) }

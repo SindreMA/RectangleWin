@@ -8,7 +8,7 @@ keybindings:
       bindfeature: rightHalf
     - modifier: [Ctrl, Win]
       key: UP_ARROW
-      bindfeature: topHalf
+      bindfeature: centerHalf
     - modifier: [Ctrl, Win]
       key: DOWN_ARROW
       bindfeature: bottomHalf
@@ -22,7 +22,7 @@ keybindings:
       bindfeature: rightThreeQuarters
     - modifier: [Ctrl, Alt, Shift]
       key: UP_ARROW
-      bindfeature: topThreeQuarters
+      bindfeature: centerThreeQuarters
     - modifier: [Ctrl, Alt, Shift]
       key: DOWN_ARROW
       bindfeature: bottomThreeQuarters
@@ -36,7 +36,7 @@ keybindings:
       bindfeature: rightOneQuarter
     - modifier: [Ctrl, Win, Shift]
       key: UP_ARROW
-      bindfeature: topOneQuarter
+      bindfeature: center
     - modifier: [Ctrl, Win, Shift]
       key: DOWN_ARROW
       bindfeature: bottomOneQuarter
