@@ -8,35 +8,35 @@ keybindings:
       bindfeature: rightHalf
     - modifier: [Ctrl, Win]
       key: UP_ARROW
-      bindfeature: centerHalf
+      bindfeature: moveToCenter
     - modifier: [Ctrl, Win]
       key: DOWN_ARROW
       bindfeature: bottomHalf
 
-    # Ctrl+Alt+Shift+Arrows = 3/4 screen
+    # Ctrl+Alt+Shift+Arrows = 2/3 screen
     - modifier: [Ctrl, Alt, Shift]
       key: LEFT_ARROW
-      bindfeature: leftThreeQuarters
+      bindfeature: leftTwoThirds
     - modifier: [Ctrl, Alt, Shift]
       key: RIGHT_ARROW
-      bindfeature: rightThreeQuarters
+      bindfeature: rightTwoThirds
     - modifier: [Ctrl, Alt, Shift]
       key: UP_ARROW
-      bindfeature: centerThreeQuarters
+      bindfeature: moveToCenter
     - modifier: [Ctrl, Alt, Shift]
       key: DOWN_ARROW
-      bindfeature: bottomThreeQuarters
+      bindfeature: bottomTwoThirds
 
-    # Ctrl+Win+Shift+Arrows = 1/4 screen
+    # Ctrl+Win+Shift+Arrows = 1/3 screen
     - modifier: [Ctrl, Win, Shift]
       key: LEFT_ARROW
-      bindfeature: leftOneQuarter
+      bindfeature: leftOneThirds
     - modifier: [Ctrl, Win, Shift]
       key: RIGHT_ARROW
-      bindfeature: rightOneQuarter
+      bindfeature: rightOneThirds
     - modifier: [Ctrl, Win, Shift]
       key: UP_ARROW
-      bindfeature: center
+      bindfeature: moveToCenter
     - modifier: [Ctrl, Win, Shift]
       key: DOWN_ARROW
-      bindfeature: bottomOneQuarter
+      bindfeature: bottomOneThirds

@@ -49,7 +49,7 @@ func main() {
 	edgeFuncs := [][]resizeFunc{
 		{leftHalf, leftThreeQuarters, leftOneQuarter},
 		{rightHalf, rightThreeQuarters, rightOneQuarter},
-		{centerHalf, centerThreeQuarters, centerOneQuarter},
+		{centerHalf, centerTwoThirds, centerOneThirds},
 		{bottomHalf, bottomThreeQuarters, bottomOneQuarter}}
 	edgeFuncTurn := make([]int, len(edgeFuncs))
 	cornerFuncs := [][]resizeFunc{
@@ -140,6 +140,13 @@ func main() {
 	for _, keyBinding := range myConfig.Keybindings {
 		switch keyBinding.BindFeature {
 		case "moveToTop":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleEdgeFuncs(2) }}))
+		case "moveToCenter":
 			id += 1
 			hks = append(hks, (HotKey{
 				id:       id,

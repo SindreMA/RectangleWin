@@ -64,12 +64,11 @@ func topThreeQuarters(disp, _ w32.RECT) w32.RECT { return toTop(disp, 3, 4) }
 
 func toCenter(d w32.RECT, mul, div int32) w32.RECT {
 	w := d.Width() * mul / div
-	h := d.Height() * mul / div
 	return w32.RECT{
 		Left:   d.Left + (d.Width()-w)/2,
-		Top:    d.Top + (d.Height()-h)/2,
+		Top:    d.Top,
 		Right:  d.Left + (d.Width()-w)/2 + w,
-		Bottom: d.Top + (d.Height()-h)/2 + h}
+		Bottom: d.Top + d.Height()}
 }
 
 func centerHalf(disp, _ w32.RECT) w32.RECT          { return toCenter(disp, 1, 2) }
