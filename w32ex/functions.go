@@ -28,6 +28,11 @@ const (
 )
 
 var user32 = syscall.NewLazyDLL("user32.dll")
+var shcore = syscall.NewLazyDLL("shcore.dll")
+
+const (
+	DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = ^uintptr(3) // -4
+)
 
 func RegisterHotKey(hwnd w32.HWND, id, mod, vk int) bool {
 	r1, _, _ := user32.NewProc("RegisterHotKey").Call(uintptr(hwnd), uintptr(id), uintptr(mod), uintptr(vk))
@@ -65,4 +70,19 @@ func GetShellWindow() (hwnd w32.HWND) {
 func SetProcessDPIAware() bool {
 	r1, _, _ := user32.NewProc("SetProcessDPIAware").Call()
 	return r1 != 0
+}
+
+func SetProcessDpiAwarenessContext(context uintptr) bool {
+	r1, _, _ := user32.NewProc("SetProcessDpiAwarenessContext").Call(context)
+	return r1 != 0
+}
+
+func GetDpiForMonitor(hMonitor w32.HMONITOR) (dpiX, dpiY uint32, ok bool) {
+	r1, _, _ := shcore.NewProc("GetDpiForMonitor").Call(
+		uintptr(hMonitor),
+		0, // MDT_EFFECTIVE_DPI
+		uintptr(unsafe.Pointer(&dpiX)),
+		uintptr(unsafe.Pointer(&dpiY)),
+	)
+	return dpiX, dpiY, r1 == 0 // S_OK
 }

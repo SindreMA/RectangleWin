@@ -35,8 +35,11 @@ var lastResized w32.HWND
 
 func main() {
 	runtime.LockOSThread() // since we bind hotkeys etc that need to dispatch their message here
-	if !w32ex.SetProcessDPIAware() {
-		panic("failed to set DPI aware")
+	if !w32ex.SetProcessDpiAwarenessContext(w32ex.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) {
+		fmt.Println("warn: SetProcessDpiAwarenessContext(V2) failed, falling back to SetProcessDPIAware")
+		if !w32ex.SetProcessDPIAware() {
+			panic("failed to set DPI aware")
+		}
 	}
 
 	autorun, err := AutoRunEnabled()
@@ -385,11 +388,6 @@ func resize(hwnd w32.HWND, f resizeFunc, dir direction) (bool, error) {
 	}
 	rect := w32.GetWindowRect(hwnd)
 	mon := w32.MonitorFromWindow(hwnd, w32.MONITOR_DEFAULTTONEAREST)
-	hdc := w32.GetDC(hwnd)
-	displayDPI := w32.GetDeviceCaps(hdc, w32.LOGPIXELSY)
-	if !w32.ReleaseDC(hwnd, hdc) {
-		return false, fmt.Errorf("failed to ReleaseDC:%d", w32.GetLastError())
-	}
 	var monInfo w32.MONITORINFO
 	if !w32.GetMonitorInfo(mon, &monInfo) {
 		return false, fmt.Errorf("failed to GetMonitorInfo:%d", w32.GetLastError())
@@ -399,20 +397,17 @@ func resize(hwnd w32.HWND, f resizeFunc, dir direction) (bool, error) {
 	if !ok {
 		return false, fmt.Errorf("failed to DwmGetWindowAttributeEXTENDED_FRAME_BOUNDS:%d", w32.GetLastError())
 	}
-	windowDPI := w32ex.GetDpiForWindow(hwnd)
-	resizedFrame := resizeForDpi(frame, int32(windowDPI), int32(displayDPI))
 
-	fmt.Printf("> window: 0x%x %#v (w:%d,h:%d) mon=0x%X(@ display DPI:%d)\n", hwnd, rect, rect.Width(), rect.Height(), mon, displayDPI)
-	fmt.Printf("> DWM frame:        %#v (W:%d,H:%d) @ window DPI=%v\n", frame, frame.Width(), frame.Height(), windowDPI)
-	fmt.Printf("> DPI-less frame:   %#v (W:%d,H:%d)\n", resizedFrame, resizedFrame.Width(), resizedFrame.Height())
+	fmt.Printf("> window: 0x%x %#v (w:%d,h:%d) mon=0x%X\n", hwnd, rect, rect.Width(), rect.Height(), mon)
+	fmt.Printf("> DWM frame: %#v (W:%d,H:%d)\n", frame, frame.Width(), frame.Height())
 
 	// calculate how many extra pixels go to win10 invisible borders
-	lExtra := resizedFrame.Left - rect.Left
-	rExtra := -resizedFrame.Right + rect.Right
-	tExtra := resizedFrame.Top - rect.Top
-	bExtra := -resizedFrame.Bottom + rect.Bottom
+	lExtra := frame.Left - rect.Left
+	rExtra := -frame.Right + rect.Right
+	tExtra := frame.Top - rect.Top
+	bExtra := -frame.Bottom + rect.Bottom
 
-	newPos := f(monInfo.RcWork, resizedFrame)
+	newPos := f(monInfo.RcWork, frame)
 
 	// adjust offsets based on invisible borders
 	newPos.Left -= lExtra
@@ -451,7 +446,7 @@ func resize(hwnd w32.HWND, f resizeFunc, dir direction) (bool, error) {
 			return false, fmt.Errorf("failed to GetMonitorInfo for next monitor:%d", w32.GetLastError())
 		}
 		fmt.Printf("> moving to next monitor 0x%X\n", nextMon)
-		newPos = f(nextMonInfo.RcWork, resizedFrame)
+		newPos = f(nextMonInfo.RcWork, frame)
 		newPos.Left -= lExtra
 		newPos.Top -= tExtra
 		newPos.Right += rExtra
@@ -496,15 +491,6 @@ func toggleAlwaysOnTop(hwnd w32.HWND) error {
 		}
 	}
 	return nil
-}
-
-func resizeForDpi(src w32.RECT, from, to int32) w32.RECT {
-	return w32.RECT{
-		Left:   src.Left * to / from,
-		Right:  src.Right * to / from,
-		Top:    src.Top * to / from,
-		Bottom: src.Bottom * to / from,
-	}
 }
 
 func sameRect(a, b *w32.RECT) bool {

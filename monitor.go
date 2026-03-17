@@ -21,6 +21,8 @@ import (
 
 	"github.com/gonutz/w32/v2"
 	"golang.org/x/sys/windows"
+
+	"github.com/ahmetb/RectangleWin/w32ex"
 )
 
 func EnumMonitors(f func(d w32.HMONITOR) bool) bool {
@@ -97,6 +99,9 @@ func printMonitors() {
 		fmt.Printf("       rcwork:%#v (w=%v,h=%v)\n", v.RcWork, v.RcWork.Width(), v.RcWork.Height())
 		fmt.Printf("    rcmonitor:%#v (w=%v,h=%v)\n", v.RcMonitor, v.RcMonitor.Width(), v.RcWork.Height())
 		fmt.Printf("      primary:%#v\n", v.DwFlags&w32.MONITORINFOF_PRIMARY > 0)
+		if dpiX, dpiY, ok := w32ex.GetDpiForMonitor(d); ok {
+			fmt.Printf("          dpi:%d x %d (scale: %d%%)\n", dpiX, dpiY, dpiX*100/96)
+		}
 
 		ok, n := w32.GetNumberOfPhysicalMonitorsFromHMONITOR(d)
 		if !ok {
